@@ -3,495 +3,1317 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Your Pain Profile Result | Derrick Hutchinson</title>
+<title>What's Really Driving Your Pain? | Derrick Hutchinson</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --bg: #0a0a18;
+    --surface: #1a1a2e;
+    --surface2: #16213e;
+    --accent: #e94560;
+    --accent2: #c73652;
+    --light: #f5f5f5;
+    --muted: #8888aa;
+    --body-color: #c8c8da;
+    --border: #2a2a42;
+    --btn-text: #ffffff;
+  }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
+    background-color: var(--bg);
     font-family: 'DM Sans', Georgia, sans-serif;
+    color: var(--light);
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 
   body::before {
     content: '';
     position: fixed;
     inset: 0;
-    background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+    background-image: radial-gradient(circle, #2a2a42 1px, transparent 1px);
     background-size: 28px 28px;
-    opacity: 0.4;
+    opacity: 0.35;
     pointer-events: none;
     z-index: 0;
   }
 
-  body.fighter {
-    --bg: #0a0a18; --surface: #1a1a2e; --surface2: #16213e;
-    --accent: #e94560; --accent2: #c73652;
-    --light: #f5f5f5; --muted: #8888aa; --body-color: #c8c8da;
-    --border: #2a2a42; --btn-text: #ffffff;
-    background-color: var(--bg); color: var(--light);
+  /* ── SCREENS ── */
+  .screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    transform: translateX(40px);
+    overflow-y: auto;
   }
-  body.avoider {
+
+  .screen.active {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateX(0);
+  }
+
+  .screen.exit-left {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+
+  .screen-inner {
+    width: 100%;
+    max-width: 620px;
+    margin: auto;
+    padding: 20px 0;
+  }
+
+  /* ── BRAND ── */
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 48px;
+  }
+
+  .brand-dot {
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+
+  .brand-name {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap {
+    margin-bottom: 40px;
+  }
+
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .progress-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .progress-count {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  .progress-track {
+    width: 100%;
+    height: 3px;
+    background: var(--border);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 100px;
+    transition: width 0.5s ease;
+  }
+
+  /* ── INTRO ── */
+  .intro-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(233,69,96,0.12);
+    border: 1px solid rgba(233,69,96,0.3);
+    border-radius: 100px;
+    padding: 7px 16px;
+    margin-bottom: 24px;
+  }
+
+  .intro-badge-dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%,100%{opacity:1;transform:scale(1)}
+    50%{opacity:.5;transform:scale(.8)}
+  }
+
+  .intro-badge-text {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .intro-title {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: clamp(32px, 5vw, 48px);
+    color: var(--light);
+    line-height: 1.15;
+    margin-bottom: 20px;
+  }
+
+  .intro-title em {
+    color: var(--accent);
+    font-style: italic;
+  }
+
+  .intro-sub {
+    font-size: 16px;
+    color: var(--body-color);
+    line-height: 1.8;
+    font-weight: 300;
+    margin-bottom: 16px;
+    max-width: 520px;
+  }
+
+  .intro-meta {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 40px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+
+  .intro-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  .intro-meta-dot {
+    width: 5px; height: 5px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+
+  .accent-line {
+    width: 50px;
+    height: 3px;
+    background: var(--accent);
+    border-radius: 2px;
+    margin-bottom: 32px;
+  }
+
+  /* ── BUTTONS ── */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: none;
+    padding: 18px 40px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .btn-primary:hover { opacity: 0.88; }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    color: var(--accent);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: 1.5px solid var(--accent);
+    padding: 16px 36px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  /* ── QUESTION CARD ── */
+  .question-num {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .question-text {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: clamp(20px, 3.5vw, 28px);
+    color: var(--light);
+    line-height: 1.3;
+    margin-bottom: 32px;
+  }
+
+  .options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+
+  .option-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px 22px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    width: 100%;
+  }
+
+  .option-btn:hover {
+    border-color: var(--accent);
+    background: rgba(233,69,96,0.06);
+  }
+
+  .option-btn.selected {
+    border-color: var(--accent);
+    background: rgba(233,69,96,0.1);
+  }
+
+  .option-letter {
+    width: 26px;
+    height: 26px;
+    background: var(--surface2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .option-btn.selected .option-letter {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .option-text {
+    font-size: 14px;
+    color: var(--body-color);
+    line-height: 1.6;
+    font-weight: 300;
+    padding-top: 3px;
+  }
+
+  .option-btn.selected .option-text {
+    color: var(--light);
+  }
+
+  .nav-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .btn-back {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 8px 0;
+    transition: color 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .btn-back:hover { color: var(--light); }
+
+  /* ── EMAIL CAPTURE ── */
+  .capture-title {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: clamp(24px, 4vw, 36px);
+    color: var(--light);
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+
+  .capture-title em { color: var(--accent); font-style: italic; }
+
+  .capture-sub {
+    font-size: 15px;
+    color: var(--body-color);
+    line-height: 1.75;
+    font-weight: 300;
+    margin-bottom: 32px;
+    max-width: 500px;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  .form-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .form-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 16px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--light);
+    font-weight: 300;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-input::placeholder { color: var(--muted); }
+  .form-input:focus { border-color: var(--accent); }
+
+  .privacy-note {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 300;
+    margin-top: 12px;
+    line-height: 1.6;
+  }
+
+  .error-msg {
+    font-size: 12px;
+    color: var(--accent);
+    margin-top: 8px;
+    display: none;
+  }
+
+  /* ── RESULT THEMES ── */
+  body.fighter-theme {
+    --accent: #e94560; --accent2: #c73652; --btn-text: #ffffff;
+  }
+  body.avoider-theme {
     --bg: #0a1410; --surface: #1b2d2a; --surface2: #132821;
     --accent: #52B788; --accent2: #3d9068;
     --light: #f0f7f4; --muted: #6a8f80; --body-color: #b8d4c8;
     --border: #2a3e38; --btn-text: #0a1410;
-    background-color: var(--bg); color: var(--light);
+    background-color: var(--bg);
   }
-  body.rebuilder {
+  body.rebuilder-theme {
     --bg: #0e0b18; --surface: #1e1b2e; --surface2: #16132a;
     --accent: #C77DFF; --accent2: #a355e8;
     --light: #f5f0ff; --muted: #7a6a9a; --body-color: #c4b8d8;
     --border: #2e2a42; --btn-text: #0e0b18;
-    background-color: var(--bg); color: var(--light);
+    background-color: var(--bg);
   }
 
-  /* LOADING */
-  .loading-screen {
-    position: fixed; inset: 0; background: #0a0a18;
-    display: flex; flex-direction: column; align-items: center;
-    justify-content: center; z-index: 100;
-    transition: opacity 0.5s ease; gap: 20px;
-  }
-  .loading-screen.hidden { opacity: 0; pointer-events: none; }
-  .loading-text {
-    font-family: 'DM Sans', sans-serif; font-size: 12px;
-    font-weight: 600; letter-spacing: 3px; text-transform: uppercase;
-    color: #8888aa;
-  }
-  .loading-dots { display: flex; gap: 8px; }
-  .loading-dots span {
-    width: 8px; height: 8px; background: #e94560;
-    border-radius: 50%; animation: dotpulse 1.2s ease-in-out infinite;
-  }
-  .loading-dots span:nth-child(2) { animation-delay: 0.2s; background: #52B788; }
-  .loading-dots span:nth-child(3) { animation-delay: 0.4s; background: #C77DFF; }
-  @keyframes dotpulse {
-    0%,100%{transform:scale(1);opacity:1}
-    50%{transform:scale(1.5);opacity:0.5}
-  }
-
-  /* SCORE BAR */
-  .score-bar-wrapper {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; padding: 28px 32px; margin-bottom: 32px;
-  }
-  .score-bar-label {
-    font-size: 10px; font-weight: 700; letter-spacing: 2px;
-    text-transform: uppercase; color: var(--accent); margin-bottom: 10px;
-  }
-  .score-bar-title {
-    font-size: 14px; color: var(--body-color); font-weight: 300;
-    margin-bottom: 16px;
-  }
-  .score-bar-title strong { color: var(--light); font-weight: 600; }
-  .score-track {
-    width: 100%; height: 8px; background: var(--surface2);
-    border-radius: 100px; overflow: hidden; margin-bottom: 10px;
-  }
-  .score-fill {
-    height: 100%; border-radius: 100px;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    transition: width 1s ease;
-  }
-  .score-labels {
-    display: flex; justify-content: space-between;
-    font-size: 10px; color: var(--muted); font-weight: 300;
-  }
-
-  /* PAGE */
-  .page {
-    position: relative; z-index: 1; max-width: 680px;
-    margin: 0 auto; padding: 60px 24px 80px;
-    opacity: 0; transform: translateY(16px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-  }
-  .page.visible { opacity: 1; transform: translateY(0); }
-
-  .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 56px; }
-  .brand-dot { width: 10px; height: 10px; background: var(--accent); border-radius: 50%; }
-  .brand-name { font-size: 12px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); }
-
+  /* ── RESULT PAGE ── */
   .result-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    border-radius: 100px; padding: 8px 18px; margin-bottom: 24px;
-    border: 1px solid; border-color: color-mix(in srgb, var(--accent) 40%, transparent);
-    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 100px;
+    padding: 7px 16px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(128,128,128,0.3);
+    background: rgba(128,128,128,0.1);
   }
-  .badge-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
-  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)} }
-  .badge-text { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
 
-  .result-type { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
-  .hero-title { font-family: 'DM Serif Display', Georgia, serif; font-size: clamp(36px,6vw,52px); color: var(--light); line-height: 1.1; margin-bottom: 20px; }
-  .hero-title em { color: var(--accent); font-style: italic; }
-  .hero-sub { font-size: 17px; color: var(--body-color); line-height: 1.75; font-weight: 300; max-width: 560px; margin-bottom: 40px; }
-  .accent-line { width: 60px; height: 3px; background: var(--accent); border-radius: 2px; margin-bottom: 48px; }
-
-  .card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; padding: 40px; margin-bottom: 32px;
-    position: relative; overflow: hidden;
+  .result-badge-dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
   }
-  .card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+
+  .result-badge-text {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .result-type {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .result-title {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: clamp(32px, 5vw, 48px);
+    color: var(--light);
+    line-height: 1.1;
+    margin-bottom: 18px;
+  }
+
+  .result-title em { color: var(--accent); font-style: italic; }
+
+  .result-sub {
+    font-size: 16px;
+    color: var(--body-color);
+    line-height: 1.8;
+    font-weight: 300;
+    margin-bottom: 36px;
+    max-width: 520px;
+  }
+
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 32px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
     background: linear-gradient(90deg, var(--accent), var(--accent2));
   }
-  .card-label { font-size: 9px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
-  .card-title { font-family: 'DM Serif Display', Georgia, serif; font-size: 24px; color: var(--light); margin-bottom: 16px; line-height: 1.2; }
-  .card-body { font-size: 14px; color: var(--body-color); line-height: 1.85; font-weight: 300; margin-bottom: 14px; }
+
+  .card-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .card-title {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 22px;
+    color: var(--light);
+    margin-bottom: 14px;
+    line-height: 1.2;
+  }
+
+  .card-body {
+    font-size: 14px;
+    color: var(--body-color);
+    line-height: 1.85;
+    font-weight: 300;
+    margin-bottom: 12px;
+  }
+
   .card-body strong { color: var(--light); font-weight: 600; }
   .card-body:last-child { margin-bottom: 0; }
 
   .quote-block {
-    border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0;
-    padding: 22px 28px; margin: 32px 0;
-    background: color-mix(in srgb, var(--accent) 7%, transparent);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+    padding: 18px 22px;
+    margin: 24px 0;
+    background: rgba(128,128,128,0.06);
   }
-  .quote-text { font-family: 'DM Serif Display', Georgia, serif; font-size: 18px; color: var(--accent); line-height: 1.5; font-style: italic; }
 
-  .insight-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 32px 0; }
-  @media (max-width: 520px) { .insight-grid { grid-template-columns: 1fr; } }
-  .insight-block { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 20px; }
-  .insight-icon { font-size: 20px; margin-bottom: 10px; display: block; }
-  .insight-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
-  .insight-text { font-size: 13px; color: var(--body-color); line-height: 1.65; font-weight: 300; }
+  .quote-text {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 17px;
+    color: var(--accent);
+    line-height: 1.5;
+    font-style: italic;
+  }
 
-  .text-center { text-align: center; }
+  .insight-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 24px 0;
+  }
+
+  @media (max-width: 480px) {
+    .insight-grid { grid-template-columns: 1fr; }
+  }
+
+  .insight-block {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px;
+  }
+
+  .insight-icon { font-size: 18px; margin-bottom: 8px; display: block; }
+
+  .insight-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 5px;
+  }
+
+  .insight-text {
+    font-size: 12px;
+    color: var(--body-color);
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  .score-track {
+    width: 100%;
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 100px;
+    overflow: hidden;
+    margin: 12px 0 6px;
+  }
+
+  .score-fill {
+    height: 100%;
+    border-radius: 100px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 1.2s ease;
+    width: 0%;
+  }
+
+  .score-track-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
   .download-btn {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: var(--btn-text) !important; font-family: 'DM Sans', sans-serif;
-    font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-    text-decoration: none; padding: 18px 44px; border-radius: 3px; transition: opacity 0.2s;
+    color: var(--btn-text) !important;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 18px 40px;
+    border-radius: 3px;
+    transition: opacity 0.2s;
+    border: none;
+    cursor: pointer;
   }
+
   .download-btn:hover { opacity: 0.88; }
-  .download-meta { font-size: 11px; color: var(--muted); margin-top: 12px; font-weight: 300; }
 
   .call-btn {
-    display: inline-block; background: transparent;
-    color: var(--accent) !important; font-family: 'DM Sans', sans-serif;
-    font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-    text-decoration: none; padding: 16px 40px; border-radius: 3px;
-    border: 1.5px solid var(--accent); transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    color: var(--accent) !important;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 16px 36px;
+    border-radius: 3px;
+    border: 1.5px solid var(--accent);
+    transition: all 0.2s;
   }
-  .call-btn:hover { background: var(--accent); color: var(--btn-text) !important; }
-  .call-meta { font-size: 11px; color: var(--muted); margin-top: 12px; font-weight: 300; }
 
-  .footer { text-align: center; padding-top: 40px; border-top: 1px solid var(--border); }
-  .footer-name { font-family: 'DM Serif Display', Georgia, serif; font-size: 18px; color: var(--light); margin-bottom: 4px; }
-  .footer-creds { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
-  .footer-email { font-size: 12px; color: var(--muted); font-weight: 300; }
-  .footer-disclaimer { font-size: 10px; color: var(--border); filter: brightness(2); margin-top: 20px; line-height: 1.7; font-weight: 300; }
+  .call-btn:hover {
+    background: var(--accent);
+    color: var(--btn-text) !important;
+  }
+
+  .btn-row {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .meta-text {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  .footer-result {
+    text-align: center;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+  }
+
+  .footer-name {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 17px;
+    color: var(--light);
+    margin-bottom: 3px;
+  }
+
+  .footer-creds {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 3px;
+  }
+
+  .footer-email {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  .footer-disclaimer {
+    font-size: 10px;
+    color: var(--border);
+    filter: brightness(2);
+    margin-top: 16px;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  /* ── LOADING ── */
+  .loading-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    gap: 16px;
+    transition: opacity 0.5s ease;
+  }
+
+  .loading-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .loading-dots { display: flex; gap: 8px; }
+
+  .loading-dots span {
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: dotpulse 1.2s ease-in-out infinite;
+  }
+
+  .loading-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+  @keyframes dotpulse {
+    0%,100%{transform:scale(1);opacity:1}
+    50%{transform:scale(1.6);opacity:0.4}
+  }
+
+  .loading-text {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── SUBMIT STATE ── */
+  .submitting-text { display: none; }
+
+  @media (max-width: 480px) {
+    .screen { padding: 20px 16px; align-items: flex-start; }
+    .screen-inner { padding: 16px 0 40px; }
+  }
 </style>
 </head>
 <body>
 
+<!-- LOADING -->
 <div class="loading-screen" id="loadingScreen">
-  <div class="loading-dots">
-    <span></span><span></span><span></span>
-  </div>
-  <div class="loading-text">Calculating your result</div>
+  <div class="loading-dots"><span></span><span></span><span></span></div>
+  <div class="loading-text">Loading assessment</div>
 </div>
 
-<div class="page" id="mainPage">
-
-  <div class="brand">
-    <div class="brand-dot"></div>
-    <div class="brand-name">Derrick Hutchinson &nbsp;·&nbsp; Pain &amp; Performance</div>
-  </div>
-
-  <div class="result-badge">
-    <div class="badge-dot"></div>
-    <div class="badge-text">Your Result Is Ready</div>
-  </div>
-
-  <div class="result-type">Your Pain Profile</div>
-  <h1 class="hero-title">You Are<br><em id="profileName"></em></h1>
-  <p class="hero-sub" id="heroSub"></p>
-  <div class="accent-line"></div>
-
-  <!-- SCORE BAR -->
-  <div class="score-bar-wrapper">
-    <div class="score-bar-label">Your Assessment Score</div>
-    <div class="score-bar-title" id="scoreBarTitle"></div>
-    <div class="score-track">
-      <div class="score-fill" id="scoreFill" style="width:0%"></div>
+<!-- ══ SCREEN 0: INTRO ══════════════════════════════════════════════════════ -->
+<div class="screen active" id="screen-0">
+  <div class="screen-inner">
+    <div class="brand">
+      <div class="brand-dot"></div>
+      <div class="brand-name">Derrick Hutchinson &nbsp;·&nbsp; Pain &amp; Performance</div>
     </div>
-    <div class="score-labels">
-      <span>Low psychological factors</span>
-      <span>High psychological factors</span>
-    </div>
-  </div>
 
-  <!-- RESULT CARD -->
-  <div class="card">
-    <div class="card-label">What This Means</div>
-    <div class="card-title" id="cardTitle"></div>
-    <p class="card-body" id="cardBody1"></p>
-    <p class="card-body" id="cardBody2"></p>
-    <div class="quote-block">
-      <div class="quote-text" id="quoteText"></div>
+    <div class="intro-badge">
+      <div class="intro-badge-dot"></div>
+      <div class="intro-badge-text">Free Assessment</div>
     </div>
-    <div class="insight-grid">
-      <div class="insight-block">
-        <span class="insight-icon" id="icon1"></span>
-        <div class="insight-label" id="insightLabel1"></div>
-        <div class="insight-text" id="insightText1"></div>
+
+    <h1 class="intro-title">What's Really<br><em>Driving Your Pain?</em></h1>
+
+    <p class="intro-sub">Most people dealing with chronic or recurring pain are only treating half the problem. This free 2-minute assessment — rooted in pain science and Acceptance &amp; Commitment Therapy (ACT) — goes beyond your symptoms to uncover what's really keeping you stuck.</p>
+
+    <div class="accent-line"></div>
+
+    <div class="intro-meta">
+      <div class="intro-meta-item"><div class="intro-meta-dot"></div>8 questions</div>
+      <div class="intro-meta-item"><div class="intro-meta-dot"></div>2 minutes</div>
+      <div class="intro-meta-item"><div class="intro-meta-dot"></div>Personalized result</div>
+      <div class="intro-meta-item"><div class="intro-meta-dot"></div>Free guide included</div>
+    </div>
+
+    <button class="btn-primary" onclick="startQuiz()">Start the Assessment →</button>
+  </div>
+</div>
+
+<!-- ══ SCREENS 1–8: QUESTIONS ═══════════════════════════════════════════════ -->
+<!-- Generated by JS below -->
+
+<!-- ══ SCREEN 9: EMAIL CAPTURE ══════════════════════════════════════════════ -->
+<div class="screen" id="screen-9">
+  <div class="screen-inner">
+    <div class="brand">
+      <div class="brand-dot"></div>
+      <div class="brand-name">Derrick Hutchinson &nbsp;·&nbsp; Pain &amp; Performance</div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <div class="progress-label">Almost there</div>
+        <div class="progress-count">8 of 8 complete</div>
       </div>
-      <div class="insight-block">
-        <span class="insight-icon" id="icon2"></span>
-        <div class="insight-label" id="insightLabel2"></div>
-        <div class="insight-text" id="insightText2"></div>
+      <div class="progress-track">
+        <div class="progress-fill" style="width:100%"></div>
       </div>
     </div>
-    <p class="card-body" id="cardBody3"></p>
-  </div>
 
-  <!-- DOWNLOAD CARD -->
-  <div class="card text-center">
-    <div class="card-label">Your Free Guide</div>
-    <div class="card-title" id="guideTitle"></div>
-    <p class="card-body" id="guideSub"></p>
+    <h2 class="capture-title">Your result is<br><em>ready.</em></h2>
+    <p class="capture-sub">Enter your first name and email to see your personalized pain profile and receive your free guide — delivered instantly.</p>
+
+    <div class="form-group">
+      <label class="form-label" for="firstName">First Name</label>
+      <input class="form-input" type="text" id="firstName" placeholder="Your first name" autocomplete="given-name">
+      <div class="error-msg" id="nameError">Please enter your first name.</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="emailAddr">Email Address</label>
+      <input class="form-input" type="email" id="emailAddr" placeholder="your@email.com" autocomplete="email">
+      <div class="error-msg" id="emailError">Please enter a valid email address.</div>
+    </div>
+
+    <p class="privacy-note">I respect your privacy. No spam, ever. Unsubscribe anytime.</p>
+
     <br>
-    <a href="#" id="downloadBtn" class="download-btn">Download Your Guide →</a>
-    <div class="download-meta">Free PDF · 5 pages · Yours to keep</div>
-  </div>
 
-  <!-- NEXT STEPS -->
-  <div class="card">
-    <div class="card-label">Ready to Go Deeper?</div>
-    <div class="card-title" id="nextTitle"></div>
-    <p class="card-body" id="nextBody"></p>
-    <a href="https://calendly.com/derrick-painandperformance" class="call-btn">Book a Free 20-Min Call →</a>
-    <div class="call-meta">Free · No pitch · Just a real conversation</div>
-  </div>
+    <button class="btn-primary" id="submitBtn" onclick="submitForm()">
+      <span class="submit-label">Show My Result →</span>
+      <span class="submitting-text">Calculating...</span>
+    </button>
 
-  <div class="footer">
-    <div class="footer-name">Derrick Hutchinson</div>
-    <div class="footer-creds">SPT &nbsp;·&nbsp; CSCS &nbsp;·&nbsp; Pain &amp; Performance</div>
-    <div class="footer-email">derrick.painandperformance@gmail.com</div>
-    <div class="footer-disclaimer">This page is for educational purposes only and does not constitute medical advice.<br>Please consult a licensed healthcare provider for individualized treatment.</div>
-  </div>
+    <br><br>
 
+    <button class="btn-back" onclick="goBack(9)">← Back</button>
+
+  </div>
+</div>
+
+<!-- ══ SCREEN 10: RESULT ═════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-10">
+  <div class="screen-inner">
+    <div class="brand">
+      <div class="brand-dot"></div>
+      <div class="brand-name">Derrick Hutchinson &nbsp;·&nbsp; Pain &amp; Performance</div>
+    </div>
+
+    <div class="result-badge">
+      <div class="result-badge-dot"></div>
+      <div class="result-badge-text">Your Result Is Ready</div>
+    </div>
+
+    <div class="result-type">Your Pain Profile</div>
+    <h1 class="result-title">You Are<br><em id="r-name"></em></h1>
+    <p class="result-sub" id="r-sub"></p>
+    <div class="accent-line"></div>
+
+    <!-- Score bar -->
+    <div class="result-card">
+      <div class="card-label">Assessment Score</div>
+      <div class="card-body" id="r-score-label"></div>
+      <div class="score-track">
+        <div class="score-fill" id="r-score-fill"></div>
+      </div>
+      <div class="score-track-labels">
+        <span>Low psychological factors</span>
+        <span>High psychological factors</span>
+      </div>
+    </div>
+
+    <!-- What this means -->
+    <div class="result-card">
+      <div class="card-label">What This Means</div>
+      <div class="card-title" id="r-card-title"></div>
+      <p class="card-body" id="r-body1"></p>
+      <p class="card-body" id="r-body2"></p>
+      <div class="quote-block">
+        <div class="quote-text" id="r-quote"></div>
+      </div>
+      <div class="insight-grid">
+        <div class="insight-block">
+          <span class="insight-icon" id="r-icon1"></span>
+          <div class="insight-label" id="r-label1"></div>
+          <div class="insight-text" id="r-text1"></div>
+        </div>
+        <div class="insight-block">
+          <span class="insight-icon" id="r-icon2"></span>
+          <div class="insight-label" id="r-label2"></div>
+          <div class="insight-text" id="r-text2"></div>
+        </div>
+      </div>
+      <p class="card-body" id="r-body3"></p>
+    </div>
+
+    <!-- Download -->
+    <div class="result-card" style="text-align:center;">
+      <div class="card-label">Your Free Guide</div>
+      <div class="card-title" id="r-guide-title"></div>
+      <p class="card-body" id="r-guide-sub"></p>
+      <br>
+      <a id="r-download-btn" href="#" class="download-btn" target="_blank">Download Your Guide →</a>
+      <br><br>
+      <p class="meta-text">Free PDF &nbsp;·&nbsp; 5 pages &nbsp;·&nbsp; Yours to keep</p>
+    </div>
+
+    <!-- Call CTA -->
+    <div class="result-card">
+      <div class="card-label">Ready to Go Deeper?</div>
+      <div class="card-title" id="r-next-title"></div>
+      <p class="card-body" id="r-next-body"></p>
+      <br>
+      <div class="btn-row">
+        <a href="https://calendly.com/derrick-painandperformance" class="call-btn" target="_blank">Book a Free 20-Min Call →</a>
+        <p class="meta-text">Free &nbsp;·&nbsp; No pitch &nbsp;·&nbsp; Just a real conversation</p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-result">
+      <div class="footer-name">Derrick Hutchinson</div>
+      <div class="footer-creds">SPT &nbsp;·&nbsp; CSCS &nbsp;·&nbsp; Pain &amp; Performance</div>
+      <div class="footer-email">derrick.painandperformance@gmail.com</div>
+      <div class="footer-disclaimer">This assessment is for educational purposes only and does not constitute medical advice.<br>Please consult a licensed healthcare provider for individualized treatment.</div>
+    </div>
+
+  </div>
 </div>
 
 <script>
-// ── SCORING MAP ───────────────────────────────────────────────────────────────
-// Each question answer maps to a score 1-4
-// Higher score = more fear-avoidance / lower coping
+// ══ QUESTION DATA ════════════════════════════════════════════════════════════
+const questions = [
+  {
+    text: "Over the past 2 weeks, how often have you noticed changes in your appetite, sleep, or overall mood because of your pain?",
+    options: [
+      "Not at all — my mood and habits have stayed pretty normal",
+      "Several days — I've noticed it but it hasn't changed much",
+      "More than half the days — it's noticeably affecting my daily life",
+      "Nearly every day — it's significantly disrupting how I feel and function"
+    ]
+  },
+  {
+    text: "How often do unwanted thoughts about your pain run through your mind and bother you?",
+    options: [
+      "Almost never — I can usually think about other things",
+      "Sometimes — it pops up but I can move on",
+      "Often — it's regularly on my mind even when I don't want it to be",
+      "Almost always — thoughts about my pain are hard to shake"
+    ]
+  },
+  {
+    text: "How much do you agree with this statement: \"There must be something seriously wrong or dangerous happening in my body for me to be in this much pain.\"",
+    options: [
+      "Strongly disagree — I don't think my pain means something is dangerously wrong",
+      "Somewhat disagree — I'm not sure but I try not to assume the worst",
+      "Somewhat agree — I do worry that something harmful is going on",
+      "Strongly agree — I'm convinced something dangerous is causing my pain"
+    ]
+  },
+  {
+    text: "When you're experiencing pain, how hard is it to keep it from taking over your thoughts?",
+    options: [
+      "Not at all hard — I can focus on other things fairly easily",
+      "Slightly hard — it takes some effort but I manage",
+      "Moderately hard — pain dominates my thinking during flare-ups",
+      "Almost impossible — I can't seem to keep it out of my mind at all"
+    ]
+  },
+  {
+    text: "How much do you worry that physical activity will make your pain worse or cause further harm?",
+    options: [
+      "Not at all — I stay active and don't fear movement making things worse",
+      "A little — I'm cautious but still move and exercise",
+      "Quite a bit — I avoid certain movements or activities to protect myself",
+      "A great deal — I've significantly cut back on physical activity out of fear"
+    ]
+  },
+  {
+    text: "How much has pain limited what you're able to do at work, at home, or in activities that matter to you?",
+    options: [
+      "Minimally — I've adapted and kept doing most things",
+      "Moderately — I've had to cut back but I'm still functioning",
+      "Significantly — pain has forced me to stop things that really matter to me",
+      "Completely — my whole life has been reorganized around avoiding pain"
+    ]
+  },
+  {
+    text: "Which statement best describes your relationship with pain right now?",
+    options: [
+      "I believe I can lead a full, meaningful life even with some pain present",
+      "I'm starting to accept that some pain might be part of moving forward",
+      "I need to eliminate my pain completely before I can get back to living my life",
+      "I haven't thought much about accepting pain — I just want it gone"
+    ]
+  },
+  {
+    text: "How confident are you in your ability to manage your pain and keep doing the things that matter — even on hard days?",
+    options: [
+      "Very confident — I feel capable of managing my pain and staying active",
+      "Somewhat confident — I have good days and bad days but generally cope",
+      "Not very confident — pain has taken a lot from me and I'm unsure I can get it back",
+      "Not at all confident — I feel like my body has let me down and I don't know where to start"
+    ]
+  }
+];
 
-const answerScores = {
-  // Q1 — Negative Mood
-  "not at all — my mood and habits have stayed pretty normal": 1,
-  "several days — i've noticed it but it hasn't changed much": 2,
-  "more than half the days — it's noticeably affecting my daily life": 3,
-  "nearly every day — it's significantly disrupting how i feel and function": 4,
-
-  // Q2 — Rumination
-  "almost never — i can usually think about other things": 1,
-  "sometimes — it pops up but i can move on": 2,
-  "often — it's regularly on my mind even when i don't want it to be": 3,
-  "almost always — thoughts about my pain are hard to shake": 4,
-
-  // Q3 — Danger appraisal
-  "strongly disagree — i don't think my pain means something is dangerously wrong": 1,
-  "somewhat disagree — i'm not sure but i try not to assume the worst": 2,
-  "somewhat agree — i do worry that something harmful is going on": 3,
-  "strongly agree — i'm convinced something dangerous is causing my pain": 4,
-
-  // Q4 — Catastrophizing
-  "not at all hard — i can focus on other things fairly easily": 1,
-  "slightly hard — it takes some effort but i manage": 2,
-  "moderately hard — pain dominates my thinking during flare-ups": 3,
-  "almost impossible — i can't seem to keep it out of my mind at all": 4,
-
-  // Q5 — Kinesiophobia
-  "not at all — i stay active and don't fear movement making things worse": 1,
-  "a little — i'm cautious but still move and exercise": 2,
-  "quite a bit — i avoid certain movements or activities to protect myself": 3,
-  "a great deal — i've significantly cut back on physical activity out of fear": 4,
-
-  // Q6 — Activity limitation
-  "minimally — i've adapted and kept doing most things": 1,
-  "moderately — i've had to cut back but i'm still functioning": 2,
-  "significantly — pain has forced me to stop things that really matter to me": 3,
-  "completely — my whole life has been reorganized around avoiding pain": 4,
-
-  // Q7 — Pain acceptance
-  "i believe i can lead a full, meaningful life even with some pain present": 1,
-  "i'm starting to accept that some pain might be part of moving forward": 2,
-  "i need to eliminate my pain completely before i can get back to living my life": 3,
-  "i haven't thought much about accepting pain — i just want it gone": 4,
-
-  // Q8 — Self-efficacy
-  "very confident — i feel capable of managing my pain and staying active": 1,
-  "somewhat confident — i have good days and bad days but generally cope": 2,
-  "not very confident — pain has taken a lot from me and i'm unsure i can get it back": 3,
-  "not at all confident — i feel like my body has let me down and i don't know where to start": 4,
-};
-
-// ── PROFILE DATA ──────────────────────────────────────────────────────────────
+// ══ PROFILE DATA ═════════════════════════════════════════════════════════════
 const profiles = {
   fighter: {
-    theme: 'fighter',
+    theme: 'fighter-theme',
     name: 'The Fighter.',
-    heroSub: "You push through. You don't stop. But that same drive is quietly working against you — and this guide shows you exactly why, and what to do instead.",
-    scoreBarTitle: 'Your score indicates <strong>low fear-avoidance with low pain acceptance</strong> — the hallmark of a high-drive, push-through pain pattern.',
+    sub: "You push through. You don't stop. But that same drive is quietly working against you — and this guide shows you exactly why, and what to do instead.",
+    scoreLabel: 'Your score indicates <strong>low fear-avoidance with low pain acceptance</strong> — the hallmark of a high-drive, push-through pain pattern.',
     cardTitle: "You've been fighting your pain. It's time to work with it.",
-    cardBody1: "You're driven, disciplined, and you refuse to let pain slow you down. The problem? Your body is sending you signals you've learned to override — and the gap between what you're pushing through and what your body actually needs is quietly making things worse.",
-    cardBody2: "High performers like you often treat pain as weakness rather than information. But here's what the research tells us: <strong>pain is not a sign of damage.</strong> It's a signal from your nervous system — and when you consistently override that signal, your nervous system learns to turn the volume up.",
+    body1: "You're driven, disciplined, and you refuse to let pain slow you down. The problem? Your body is sending you signals you've learned to override — and the gap between what you're pushing through and what your body actually needs is quietly making things worse.",
+    body2: "High performers like you often treat pain as weakness rather than information. But here's what the research tells us: <strong>pain is not a sign of damage.</strong> It's a signal from your nervous system — and when you consistently override that signal, your nervous system learns to turn the volume up.",
     quote: '"Your values guide your business. Why aren\'t they guiding your health?"',
-    icon1: '⚡', insightLabel1: "What's Driving It",
-    insightText1: "Low pain acceptance + high drive = nervous system overload. Your biggest obstacle is the belief that rest equals failure.",
-    icon2: '🎯', insightLabel2: "Your Lever",
-    insightText2: "Learning to separate clean pain (the sensation) from dirty pain (the story) will change everything for you.",
-    cardBody3: "You don't need to stop being a high performer. You need to redirect that drive toward <strong>understanding your pain</strong> rather than fighting it.",
+    icon1: '⚡', label1: "What's Driving It", text1: "Low pain acceptance + high drive = nervous system overload. Your biggest obstacle is the belief that rest equals failure.",
+    icon2: '🎯', label2: "Your Lever", text2: "Learning to separate clean pain (the sensation) from dirty pain (the story) will change everything for you.",
+    body3: "You don't need to stop being a high performer. You need to redirect that drive toward <strong>understanding your pain</strong> rather than fighting it.",
     guideTitle: "The Fighter's Pain Reset Guide",
     guideSub: "Your personalized 30-day framework — pain science, ACT tools, and a values-based action plan built specifically for how you experience pain.",
     guideLink: "https://drive.google.com/file/d/1Z5ZUpzymfOJS9Y4J3PQvcM9ESd-QjGnw/view?usp=drive_link",
     nextTitle: "You Don't Have to Figure This Out Alone.",
-    nextBody: "If this resonated — if you're serious about getting back to what matters most with a framework that actually addresses what's driving your pain — I'd love to talk. I offer free 20-minute discovery calls for high performers who are ready to stop fighting their pain and start working with it."
+    nextBody: "If this resonated — if you're serious about getting back to what matters most with a framework that actually addresses what's driving your pain — I'd love to talk. I offer free 20-minute discovery calls for high performers who are ready to stop fighting their pain and start working with it.",
+    scoreBar: 28
   },
   rebuilder: {
-    theme: 'rebuilder',
+    theme: 'rebuilder-theme',
     name: 'The Rebuilder.',
-    heroSub: "You're asking better questions now. That means you're ready for a deeper approach — one that uses your values as the foundation for lasting recovery. You're closer than you think.",
-    scoreBarTitle: 'Your score indicates <strong>a mixed pain profile</strong> — a combination of physical and psychological factors that respond well to a values-based approach.',
+    sub: "You're asking better questions now. That means you're ready for a deeper approach — one that uses your values as the foundation for lasting recovery.",
+    scoreLabel: 'Your score indicates <strong>a mixed pain profile</strong> — a combination of physical and psychological factors that respond well to a values-based approach.',
     cardTitle: "You've sensed there's a deeper layer. You're right.",
-    cardBody1: "You've been through enough that you've started asking better questions. You've tried the quick fixes. Maybe you've had good stretches followed by frustrating setbacks. But something in you senses that pain isn't just a physical problem with a purely physical solution.",
-    cardBody2: "<strong>That instinct is correct.</strong> The fact that you're here — asking what's really driving your pain — puts you ahead of most people. You have the self-awareness to do the deeper work, and that's exactly the kind of work that leads to lasting change.",
+    body1: "You've been through enough that you've started asking better questions. You've tried the quick fixes. Maybe you've had good stretches followed by frustrating setbacks. But something in you senses that pain isn't just a physical problem with a purely physical solution.",
+    body2: "<strong>That instinct is correct.</strong> The fact that you're here — asking what's really driving your pain — puts you ahead of most people. You have the self-awareness to do the deeper work, and that's exactly the kind of work that leads to lasting change.",
     quote: '"The goal is not a pain-free life. The goal is a values-full life."',
-    icon1: '🔬', insightLabel1: "What's Driving It",
-    insightText1: "A mix of physical, psychological, and lifestyle factors. The good news: you're already open to the approach that works best.",
-    icon2: '🧭', insightLabel2: "Your Lever",
-    insightText2: 'Clarifying your values and using them as a compass — not "get rid of pain" but "get back to what matters most."',
-    cardBody3: 'The shift from <strong>"eliminate pain"</strong> as your goal to <strong>"live by your values"</strong> as your direction changes everything about motivation, resilience, and how you relate to setbacks.',
+    icon1: '🔬', label1: "What's Driving It", text1: "A mix of physical, psychological, and lifestyle factors. The good news: you're already open to the approach that works best.",
+    icon2: '🧭', label2: "Your Lever", text2: 'Clarifying your values and using them as a compass — not "get rid of pain" but "get back to what matters most."',
+    body3: 'The shift from <strong>"eliminate pain"</strong> as your goal to <strong>"live by your values"</strong> as your direction changes everything about motivation, resilience, and how you relate to setbacks.',
     guideTitle: "The Rebuilder's Values-Based Recovery Guide",
     guideSub: "Your personalized 30-day framework — the biopsychosocial model explained, all 6 ACT core processes, the 80th Birthday values exercise, and a foundation plan built for where you are right now.",
     guideLink: "https://drive.google.com/file/d/1ZicFZL558N28gxwmxni0Zs8rAq3uXIln/view?usp=drive_link",
     nextTitle: "Build on This With Real Support.",
-    nextBody: "What you've started here is the foundation of a genuinely different approach to pain — one that has your values at the center. If you want to go deeper with personalized guidance — pain science education, ACT-based tools, and a clear path back to what matters most — I'd love to connect."
+    nextBody: "What you've started here is the foundation of a genuinely different approach to pain — one that has your values at the center. If you want to go deeper with personalized guidance — pain science education, ACT-based tools, and a clear path back to what matters most — I'd love to connect.",
+    scoreBar: 50
   },
   avoider: {
-    theme: 'avoider',
+    theme: 'avoider-theme',
     name: 'The Avoider.',
-    heroSub: "Your nervous system learned to protect you. Now it's protecting you from the life you actually want. This guide is your gentle, evidence-based path back.",
-    scoreBarTitle: 'Your score indicates <strong>elevated fear-avoidance and low self-efficacy</strong> — the clearest drivers of chronic pain that keep people stuck.',
+    sub: "Your nervous system learned to protect you. Now it's protecting you from the life you actually want. This guide is your gentle, evidence-based path back.",
+    scoreLabel: 'Your score indicates <strong>elevated fear-avoidance and low self-efficacy</strong> — the clearest drivers of chronic pain that keep people stuck.',
     cardTitle: "Your brain built walls to keep you safe. They became your prison.",
-    cardBody1: "You've been hurt before — and your nervous system learned one very clear lesson: movement and activity equal danger. So it protects you by making pain feel bigger, more threatening, and more permanent than it may actually be.",
-    cardBody2: "<strong>This is not weakness.</strong> This is your brain doing exactly what it was designed to do. But the protective response that was meant to keep you safe has gone into overdrive — and now it's keeping you from the life you actually want to live.",
+    body1: "You've been hurt before — and your nervous system learned one very clear lesson: movement and activity equal danger. So it protects you by making pain feel bigger, more threatening, and more permanent than it may actually be.",
+    body2: "<strong>This is not weakness.</strong> This is your brain doing exactly what it was designed to do. But the protective response that was meant to keep you safe has gone into overdrive — and now it's keeping you from the life you actually want to live.",
     quote: '"What would you do if pain weren\'t in the way — and are you willing to start moving toward that, even with pain present?"',
-    icon1: '🧠', insightLabel1: "What's Driving It",
-    insightText1: "Fear-avoidance and catastrophizing are amplifying your pain signal — often more than the physical sensation itself.",
-    icon2: '🌱', insightLabel2: "Your Lever",
-    insightText2: "Gradual, values-guided re-engagement. Small steps build the evidence your nervous system needs to lower its alarm.",
-    cardBody3: "The path forward isn't more rest — it's learning that <strong>pain does not equal damage</strong>, and reconnecting with what matters most as your compass back.",
+    icon1: '🧠', label1: "What's Driving It", text1: "Fear-avoidance and catastrophizing are amplifying your pain signal — often more than the physical sensation itself.",
+    icon2: '🌱', label2: "Your Lever", text2: "Gradual, values-guided re-engagement. Small steps build the evidence your nervous system needs to lower its alarm.",
+    body3: "The path forward isn't more rest — it's learning that <strong>pain does not equal damage</strong>, and reconnecting with what matters most as your compass back.",
     guideTitle: "The Avoider's Path Back Guide",
     guideSub: "Your personalized 30-day framework — breaking the fear-avoidance loop, ACT tools for willingness, and a gentle step-by-step path back to what matters most.",
     guideLink: "https://drive.google.com/file/d/1rhO7O4DC4seBQDsljLwKL-3PvlnZY9Ie/view?usp=drive_link",
     nextTitle: "The Life You Want Is Still Available.",
-    nextBody: "The walls pain built around your life are not permanent. They were learned — and they can be unlearned. If you want support doing this work with a framework that addresses the root of fear-avoidance — not just the symptoms — I'd love to connect."
+    nextBody: "The walls pain built around your life are not permanent. They were learned — and they can be unlearned. If you want support doing this work with a framework that addresses the root of fear-avoidance — not just the symptoms — I'd love to connect.",
+    scoreBar: 78
   }
 };
 
-// ── SCORE DETECTION ───────────────────────────────────────────────────────────
-function getScoreFromURL() {
-  const params = new URLSearchParams(window.location.search);
+// ══ STATE ════════════════════════════════════════════════════════════════════
+let currentScreen = 0;
+let answers = new Array(8).fill(null);
+const letters = ['A','B','C','D'];
 
-  // Option 1: Direct profile override (e.g. ?profile=fighter)
-  const directProfile = (params.get('profile') || '').toLowerCase();
-  if (['fighter','avoider','rebuilder'].includes(directProfile)) {
-    return { profile: directProfile, score: null };
-  }
+// ══ BUILD QUESTION SCREENS ═══════════════════════════════════════════════════
+function buildQuestions() {
+  questions.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'screen';
+    div.id = `screen-${i + 1}`;
 
-  // Option 2: Numeric score passed by Tally (e.g. ?score=22)
-  const scoreParam = params.get('score');
-  if (scoreParam) {
-    const score = parseInt(scoreParam);
-    if (score >= 8 && score <= 16)  return { profile: 'fighter',   score };
-    if (score >= 17 && score <= 24) return { profile: 'rebuilder', score };
-    if (score >= 25 && score <= 32) return { profile: 'avoider',   score };
-  }
+    const pct = Math.round((i / 8) * 100);
 
-  // Option 3: Individual answer params passed by Tally
-  // Tally can pass each answer as q1=answer&q2=answer etc.
-  const answers = [];
-  for (let i = 1; i <= 8; i++) {
-    const ans = params.get(`q${i}`);
-    if (ans) answers.push(ans.toLowerCase().trim());
-  }
+    div.innerHTML = `
+      <div class="screen-inner">
+        <div class="brand">
+          <div class="brand-dot"></div>
+          <div class="brand-name">Derrick Hutchinson &nbsp;·&nbsp; Pain &amp; Performance</div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-meta">
+            <div class="progress-label">Question ${i + 1} of 8</div>
+            <div class="progress-count">${pct}% complete</div>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width:${pct}%"></div>
+          </div>
+        </div>
+        <div class="question-num">Question ${i + 1}</div>
+        <div class="question-text">${q.text}</div>
+        <div class="options-grid" id="options-${i + 1}">
+          ${q.options.map((opt, j) => `
+            <button class="option-btn" onclick="selectAnswer(${i + 1}, ${j + 1}, this)">
+              <div class="option-letter">${letters[j]}</div>
+              <div class="option-text">${opt}</div>
+            </button>
+          `).join('')}
+        </div>
+        <div class="nav-row">
+          <button class="btn-primary" id="next-${i + 1}" onclick="nextScreen(${i + 1})" disabled style="opacity:0.4;cursor:not-allowed;">
+            ${i < 7 ? 'Next →' : 'Almost done →'}
+          </button>
+          ${i > 0 ? `<button class="btn-back" onclick="goBack(${i + 1})">← Back</button>` : ''}
+        </div>
+      </div>
+    `;
 
-  if (answers.length > 0) {
-    let total = 0;
-    answers.forEach(ans => {
-      const score = answerScores[ans];
-      if (score) total += score;
-      else total += 2; // default mid score if answer not matched
-    });
-    // Fill any missing questions with mid score
-    total += (8 - answers.length) * 2;
-    if (total >= 8  && total <= 16) return { profile: 'fighter',   score: total };
-    if (total >= 17 && total <= 24) return { profile: 'rebuilder', score: total };
-    if (total >= 25 && total <= 32) return { profile: 'avoider',   score: total };
-  }
-
-  // Default fallback
-  return { profile: 'rebuilder', score: null };
+    document.body.appendChild(div);
+  });
 }
 
-// ── POPULATE PAGE ─────────────────────────────────────────────────────────────
-function populatePage(profileKey, score) {
-  const d = profiles[profileKey];
-  document.body.className = d.theme;
+// ══ NAVIGATION ═══════════════════════════════════════════════════════════════
+function showScreen(n) {
+  const current = document.getElementById(`screen-${currentScreen}`);
+  const next = document.getElementById(`screen-${n}`);
 
-  document.getElementById('profileName').textContent = d.name;
-  document.getElementById('heroSub').textContent = d.heroSub;
-  document.getElementById('scoreBarTitle').innerHTML = d.scoreBarTitle;
-  document.getElementById('cardTitle').textContent = d.cardTitle;
-  document.getElementById('cardBody1').innerHTML = d.cardBody1;
-  document.getElementById('cardBody2').innerHTML = d.cardBody2;
-  document.getElementById('quoteText').textContent = d.quote;
-  document.getElementById('icon1').textContent = d.icon1;
-  document.getElementById('insightLabel1').textContent = d.insightLabel1;
-  document.getElementById('insightText1').textContent = d.insightText1;
-  document.getElementById('icon2').textContent = d.icon2;
-  document.getElementById('insightLabel2').textContent = d.insightLabel2;
-  document.getElementById('insightText2').textContent = d.insightText2;
-  document.getElementById('cardBody3').innerHTML = d.cardBody3;
-  document.getElementById('guideTitle').textContent = d.guideTitle;
-  document.getElementById('guideSub').textContent = d.guideSub;
-  document.getElementById('downloadBtn').href = d.guideLink;
-  document.getElementById('nextTitle').textContent = d.nextTitle;
-  document.getElementById('nextBody').textContent = d.nextBody;
-  document.title = d.name.replace('.','') + ' | Derrick Hutchinson';
-
-  // Animate score bar
-  if (score) {
-    const pct = ((score - 8) / (32 - 8)) * 100;
+  if (current) {
+    current.classList.add('exit-left');
     setTimeout(() => {
-      document.getElementById('scoreFill').style.width = pct + '%';
-    }, 800);
-  } else {
-    // No score — set bar based on profile
-    const defaults = { fighter: 25, rebuilder: 50, avoider: 80 };
-    setTimeout(() => {
-      document.getElementById('scoreFill').style.width = defaults[profileKey] + '%';
-    }, 800);
+      current.classList.remove('active', 'exit-left');
+    }, 400);
   }
-}
-
-// ── INIT ──────────────────────────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
-  const { profile, score } = getScoreFromURL();
-  populatePage(profile, score);
 
   setTimeout(() => {
+    next.classList.add('active');
+    window.scrollTo(0, 0);
+  }, 100);
+
+  currentScreen = n;
+}
+
+function startQuiz() {
+  showScreen(1);
+}
+
+function nextScreen(from) {
+  if (from === 8) {
+    showScreen(9);
+  } else {
+    showScreen(from + 1);
+  }
+}
+
+function goBack(from) {
+  if (from === 1) {
+    showScreen(0);
+  } else {
+    showScreen(from - 1);
+  }
+}
+
+// ══ ANSWER SELECTION ══════════════════════════════════════════════════════════
+function selectAnswer(questionNum, score, btn) {
+  // Deselect all in this question
+  const grid = document.getElementById(`options-${questionNum}`);
+  grid.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+
+  // Select this one
+  btn.classList.add('selected');
+
+  // Store score (1-4)
+  answers[questionNum - 1] = score;
+
+  // Enable next button
+  const nextBtn = document.getElementById(`next-${questionNum}`);
+  if (nextBtn) {
+    nextBtn.disabled = false;
+    nextBtn.style.opacity = '1';
+    nextBtn.style.cursor = 'pointer';
+  }
+}
+
+// ══ SCORING ═══════════════════════════════════════════════════════════════════
+function calculateProfile() {
+  const total = answers.reduce((sum, val) => sum + (val || 2), 0);
+
+  if (total <= 16) return { profile: 'fighter', score: total };
+  if (total <= 24) return { profile: 'rebuilder', score: total };
+  return { profile: 'avoider', score: total };
+}
+
+// ══ FORM SUBMISSION ═══════════════════════════════════════════════════════════
+async function submitForm() {
+  const firstName = document.getElementById('firstName').value.trim();
+  const email = document.getElementById('emailAddr').value.trim();
+  let valid = true;
+
+  document.getElementById('nameError').style.display = 'none';
+  document.getElementById('emailError').style.display = 'none';
+
+  if (!firstName) {
+    document.getElementById('nameError').style.display = 'block';
+    valid = false;
+  }
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    document.getElementById('emailError').style.display = 'block';
+    valid = false;
+  }
+
+  if (!valid) return;
+
+  // Show loading state
+  const btn = document.getElementById('submitBtn');
+  btn.querySelector('.submit-label').style.display = 'none';
+  btn.querySelector('.submitting-text').style.display = 'inline';
+  btn.disabled = true;
+
+  // Calculate result
+  const { profile, score } = calculateProfile();
+
+  // Send to Formspree (replace YOUR_FORMSPREE_ID with your actual ID)
+  try {
+    await fetch('https://formspree.io/f/mbdawnzn', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        firstName,
+        email,
+        profile,
+        score,
+        answers: answers.join(',')
+      })
+    });
+  } catch(e) {
+    // Continue to result even if submission fails
+    console.log('Form submission error:', e);
+  }
+
+  // Show result
+  showResult(profile, score, firstName);
+}
+
+// ══ RESULT ═══════════════════════════════════════════════════════════════════
+function showResult(profileKey, score, firstName) {
+  const d = profiles[profileKey];
+
+  // Apply theme
+  document.body.className = d.theme;
+
+  // Populate result
+  document.getElementById('r-name').textContent = d.name;
+  document.getElementById('r-sub').textContent = d.sub;
+  document.getElementById('r-score-label').innerHTML = d.scoreLabel;
+  document.getElementById('r-card-title').textContent = d.cardTitle;
+  document.getElementById('r-body1').innerHTML = d.body1;
+  document.getElementById('r-body2').innerHTML = d.body2;
+  document.getElementById('r-quote').textContent = d.quote;
+  document.getElementById('r-icon1').textContent = d.icon1;
+  document.getElementById('r-label1').textContent = d.label1;
+  document.getElementById('r-text1').textContent = d.text1;
+  document.getElementById('r-icon2').textContent = d.icon2;
+  document.getElementById('r-label2').textContent = d.label2;
+  document.getElementById('r-text2').textContent = d.text2;
+  document.getElementById('r-body3').innerHTML = d.body3;
+  document.getElementById('r-guide-title').textContent = d.guideTitle;
+  document.getElementById('r-guide-sub').textContent = d.guideSub;
+  document.getElementById('r-download-btn').href = d.guideLink;
+  document.getElementById('r-next-title').textContent = d.nextTitle;
+  document.getElementById('r-next-body').textContent = d.nextBody;
+
+  showScreen(10);
+
+  // Animate score bar
+  const pct = ((score - 8) / (32 - 8)) * 100;
+  setTimeout(() => {
+    document.getElementById('r-score-fill').style.width = pct + '%';
+  }, 600);
+}
+
+// ══ INIT ══════════════════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  buildQuestions();
+  setTimeout(() => {
     document.getElementById('loadingScreen').classList.add('hidden');
-    document.getElementById('mainPage').classList.add('visible');
-  }, 700);
+  }, 600);
 });
 </script>
 </body>
