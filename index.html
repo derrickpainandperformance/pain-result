@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Pain Profile Result | Derrick Hutchinson</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', Georgia, sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s ease;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── PROFILE THEMES ── */
+  body.fighter {
+    --bg: #0a0a18;
+    --surface: #1a1a2e;
+    --surface2: #16213e;
+    --accent: #e94560;
+    --accent2: #c73652;
+    --light: #f5f5f5;
+    --muted: #8888aa;
+    --body-color: #c8c8da;
+    --border: #2a2a42;
+    --btn-text: #ffffff;
+    background-color: var(--bg);
+    color: var(--light);
+  }
+
+  body.avoider {
+    --bg: #0a1410;
+    --surface: #1b2d2a;
+    --surface2: #132821;
+    --accent: #52B788;
+    --accent2: #3d9068;
+    --light: #f0f7f4;
+    --muted: #6a8f80;
+    --body-color: #b8d4c8;
+    --border: #2a3e38;
+    --btn-text: #0a1410;
+    background-color: var(--bg);
+    color: var(--light);
+  }
+
+  body.rebuilder {
+    --bg: #0e0b18;
+    --surface: #1e1b2e;
+    --surface2: #16132a;
+    --accent: #C77DFF;
+    --accent2: #a355e8;
+    --light: #f5f0ff;
+    --muted: #7a6a9a;
+    --body-color: #c4b8d8;
+    --border: #2e2a42;
+    --btn-text: #0e0b18;
+    background-color: var(--bg);
+    color: var(--light);
+  }
+
+  /* ── LOADING STATE ── */
+  body.loading { background-color: #0a0a18; }
+  .loading-screen {
+    position: fixed;
+    inset: 0;
+    background: #0a0a18;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    transition: opacity 0.4s ease;
+  }
+  .loading-screen.hidden { opacity: 0; pointer-events: none; }
+  .loading-dot {
+    width: 10px; height: 10px;
+    background: #e94560;
+    border-radius: 50%;
+    animation: loadpulse 1s ease-in-out infinite;
+  }
+  @keyframes loadpulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.5; }
+  }
+
+  /* ── PAGE LAYOUT ── */
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .page.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── BRAND ── */
+  .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 56px; }
+  .brand-dot { width: 10px; height: 10px; background: var(--accent); border-radius: 50%; flex-shrink: 0; }
+  .brand-name { font-size: 12px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); }
+
+  /* ── RESULT BADGE ── */
+  .result-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(128,128,128,0.12);
+    border: 1px solid rgba(128,128,128,0.3);
+    border-radius: 100px; padding: 8px 18px; margin-bottom: 24px;
+    border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+  .badge-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)} }
+  .badge-text { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+
+  /* ── HERO ── */
+  .result-type { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .hero-title { font-family: 'DM Serif Display', Georgia, serif; font-size: clamp(36px, 6vw, 52px); color: var(--light); line-height: 1.1; margin-bottom: 20px; }
+  .hero-title em { color: var(--accent); font-style: italic; }
+  .hero-sub { font-size: 17px; color: var(--body-color); line-height: 1.75; font-weight: 300; max-width: 560px; margin-bottom: 40px; }
+  .accent-line { width: 60px; height: 3px; background: var(--accent); border-radius: 2px; margin-bottom: 48px; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 40px; margin-bottom: 32px;
+    position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+  .card-label { font-size: 9px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+  .card-title { font-family: 'DM Serif Display', Georgia, serif; font-size: 24px; color: var(--light); margin-bottom: 16px; line-height: 1.2; }
+  .card-body { font-size: 14px; color: var(--body-color); line-height: 1.85; font-weight: 300; margin-bottom: 14px; }
+  .card-body strong { color: var(--light); font-weight: 600; }
+
+  /* ── QUOTE ── */
+  .quote-block {
+    border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0;
+    padding: 22px 28px; margin: 32px 0;
+    background: color-mix(in srgb, var(--accent) 7%, transparent);
+  }
+  .quote-text { font-family: 'DM Serif Display', Georgia, serif; font-size: 18px; color: var(--accent); line-height: 1.5; font-style: italic; }
+
+  /* ── INSIGHT GRID ── */
+  .insight-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 32px 0; }
+  @media (max-width: 520px) { .insight-grid { grid-template-columns: 1fr; } }
+  .insight-block { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 20px; }
+  .insight-icon { font-size: 20px; margin-bottom: 10px; display: block; }
+  .insight-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+  .insight-text { font-size: 13px; color: var(--body-color); line-height: 1.65; font-weight: 300; }
+
+  /* ── DOWNLOAD BUTTON ── */
+  .download-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: var(--btn-text) !important;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; text-decoration: none;
+    padding: 18px 44px; border-radius: 3px; transition: opacity 0.2s;
+  }
+  .download-btn:hover { opacity: 0.88; }
+  .download-meta { font-size: 11px; color: var(--muted); margin-top: 12px; font-weight: 300; }
+
+  /* ── CALL BUTTON ── */
+  .call-btn {
+    display: inline-block; background: transparent;
+    color: var(--accent) !important;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; text-decoration: none;
+    padding: 16px 40px; border-radius: 3px; border: 1.5px solid var(--accent);
+    transition: all 0.2s;
+  }
+  .call-btn:hover { background: var(--accent); color: var(--btn-text) !important; }
+  .call-meta { font-size: 11px; color: var(--muted); margin-top: 12px; font-weight: 300; }
+
+  /* ── FOOTER ── */
+  .footer { text-align: center; padding-top: 40px; border-top: 1px solid var(--border); }
+  .footer-name { font-family: 'DM Serif Display', Georgia, serif; font-size: 18px; color: var(--light); margin-bottom: 4px; }
+  .footer-creds { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
+  .footer-email { font-size: 12px; color: var(--muted); font-weight: 300; }
+  .footer-disclaimer { font-size: 10px; color: var(--border); margin-top: 20px; line-height: 1.7; font-weight: 300; filter: brightness(2); }
+
+  .text-center { text-align: center; }
+  .mt-0 { margin-top: 0; }
+</style>
+</head>
+<body class="loading">
+
+<!-- LOADING SCREEN -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-dot"></div>
+</div>
+
+<!-- PAGE CONTENT -->
+<div class="page" id="mainPage">
+
+  <div class="brand">
+    <div class="brand-dot"></div>
+    <div class="brand-name">Derrick Hutchinson &nbsp;·&nbsp; Pain &amp; Performance</div>
+  </div>
+
+  <div class="result-badge">
+    <div class="badge-dot"></div>
+    <div class="badge-text">Your Result Is Ready</div>
+  </div>
+
+  <div class="result-type">Your Pain Profile</div>
+  <h1 class="hero-title">You Are<br><em id="profileName">...</em></h1>
+  <p class="hero-sub" id="heroSub"></p>
+  <div class="accent-line"></div>
+
+  <!-- RESULT CARD -->
+  <div class="card">
+    <div class="card-label">What This Means</div>
+    <div class="card-title" id="cardTitle"></div>
+    <p class="card-body" id="cardBody1"></p>
+    <p class="card-body" id="cardBody2"></p>
+    <div class="quote-block">
+      <div class="quote-text" id="quoteText"></div>
+    </div>
+    <div class="insight-grid">
+      <div class="insight-block">
+        <span class="insight-icon" id="icon1"></span>
+        <div class="insight-label" id="insightLabel1"></div>
+        <div class="insight-text" id="insightText1"></div>
+      </div>
+      <div class="insight-block">
+        <span class="insight-icon" id="icon2"></span>
+        <div class="insight-label" id="insightLabel2"></div>
+        <div class="insight-text" id="insightText2"></div>
+      </div>
+    </div>
+    <p class="card-body" id="cardBody3"></p>
+  </div>
+
+  <!-- DOWNLOAD CARD -->
+  <div class="card text-center">
+    <div class="card-label">Your Free Guide</div>
+    <div class="card-title" id="guideTitle"></div>
+    <p class="card-body mt-0" id="guideSub"></p>
+    <br>
+    <a href="#" id="downloadBtn" class="download-btn">Download Your Guide →</a>
+    <div class="download-meta">Free PDF · 5 pages · Yours to keep</div>
+  </div>
+
+  <!-- NEXT STEPS CARD -->
+  <div class="card">
+    <div class="card-label">Ready to Go Deeper?</div>
+    <div class="card-title" id="nextTitle"></div>
+    <p class="card-body" id="nextBody"></p>
+    <a href="https://calendly.com/derrick-painandperformance" class="call-btn">Book a Free 20-Min Call →</a>
+    <div class="call-meta">Free · No pitch · Just a real conversation</div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-name">Derrick Hutchinson</div>
+    <div class="footer-creds">SPT &nbsp;·&nbsp; CSCS &nbsp;·&nbsp; Pain &amp; Performance</div>
+    <div class="footer-email">derrick.painandperformance@gmail.com</div>
+    <div class="footer-disclaimer">This page is for educational purposes only and does not constitute medical advice.<br>Please consult a licensed healthcare provider for individualized treatment.</div>
+  </div>
+
+</div>
+
+<script>
+  // ── PROFILE DATA ──────────────────────────────────────────────────────────
+  const profiles = {
+    fighter: {
+      theme: 'fighter',
+      name: 'The Fighter.',
+      heroSub: "You push through. You don't stop. But that same drive is quietly working against you — and this guide shows you exactly why, and what to do instead.",
+      cardTitle: "You've been fighting your pain. It's time to work with it.",
+      cardBody1: "You're driven, disciplined, and you refuse to let pain slow you down. The problem? Your body is sending you signals you've learned to override — and the gap between what you're pushing through and what your body actually needs is quietly making things worse.",
+      cardBody2: "High performers like you often treat pain as weakness rather than information. But here's what the research tells us: <strong>pain is not a sign of damage.</strong> It's a signal from your nervous system — and when you consistently override that signal, your nervous system learns to turn the volume up.",
+      quote: '"Your values guide your business. Why aren\'t they guiding your health?"',
+      icon1: '⚡', insightLabel1: "What's Driving It",
+      insightText1: "Low pain acceptance + high drive = nervous system overload. Your biggest obstacle is the belief that rest equals failure.",
+      icon2: '🎯', insightLabel2: "Your Lever",
+      insightText2: "Learning to separate clean pain (the sensation) from dirty pain (the story) will change everything for you.",
+      cardBody3: "You don't need to stop being a high performer. You need to redirect that drive toward <strong>understanding your pain</strong> rather than fighting it.",
+      guideTitle: "The Fighter's Pain Reset Guide",
+      guideSub: "Your personalized 30-day framework — pain science, ACT tools, and a values-based action plan built specifically for how you experience pain.",
+      guideLink: "https://drive.google.com/file/d/1Z5ZUpzymfOJS9Y4J3PQvcM9ESd-QjGnw/view?usp=drive_link",
+      nextTitle: "You Don't Have to Figure This Out Alone.",
+      nextBody: "If this resonated — if you're serious about getting back to what matters most with a framework that actually addresses what's driving your pain — I'd love to talk. I offer free 20-minute discovery calls for high performers who are ready to stop fighting their pain and start working with it."
+    },
+    avoider: {
+      theme: 'avoider',
+      name: 'The Avoider.',
+      heroSub: "Your nervous system learned to protect you. Now it's protecting you from the life you actually want. This guide is your gentle, evidence-based path back.",
+      cardTitle: "Your brain built walls to keep you safe. They became your prison.",
+      cardBody1: "You've been hurt before — and your nervous system learned one very clear lesson: movement and activity equal danger. So it protects you by making pain feel bigger, more threatening, and more permanent than it may actually be.",
+      cardBody2: "<strong>This is not weakness.</strong> This is your brain doing exactly what it was designed to do. But the protective response that was meant to keep you safe has gone into overdrive — and now it's keeping you from the life you actually want to live.",
+      quote: '"What would you do if pain weren\'t in the way — and are you willing to start moving toward that, even with pain present?"',
+      icon1: '🧠', insightLabel1: "What's Driving It",
+      insightText1: "Fear-avoidance and catastrophizing are amplifying your pain signal — often more than the physical sensation itself.",
+      icon2: '🌱', insightLabel2: "Your Lever",
+      insightText2: "Gradual, values-guided re-engagement. Small steps build the evidence your nervous system needs to lower its alarm.",
+      cardBody3: "The path forward isn't more rest — it's learning that <strong>pain does not equal damage</strong>, and reconnecting with what matters most as your compass back.",
+      guideTitle: "The Avoider's Path Back Guide",
+      guideSub: "Your personalized 30-day framework — breaking the fear-avoidance loop, ACT tools for willingness, and a gentle step-by-step path back to what matters most.",
+      guideLink: "https://drive.google.com/file/d/1rhO7O4DC4seBQDsljLwKL-3PvlnZY9Ie/view?usp=drive_link",
+      nextTitle: "The Life You Want Is Still Available.",
+      nextBody: "The walls pain built around your life are not permanent. They were learned — and they can be unlearned. If you want support doing this work with a framework that addresses the root of fear-avoidance — not just the symptoms — I'd love to connect."
+    },
+    rebuilder: {
+      theme: 'rebuilder',
+      name: 'The Rebuilder.',
+      heroSub: "You're asking better questions now. That means you're ready for a deeper approach — one that uses your values as the foundation for lasting recovery. You're closer than you think.",
+      cardTitle: "You've sensed there's a deeper layer. You're right.",
+      cardBody1: "You've been through enough that you've started asking better questions. You've tried the quick fixes. Maybe you've had good stretches followed by frustrating setbacks. But something in you senses that pain isn't just a physical problem with a purely physical solution.",
+      cardBody2: "<strong>That instinct is correct.</strong> The fact that you're here — asking what's really driving your pain — puts you ahead of most people. You have the self-awareness to do the deeper work, and that's exactly the kind of work that leads to lasting change.",
+      quote: '"The goal is not a pain-free life. The goal is a values-full life."',
+      icon1: '🔬', insightLabel1: "What's Driving It",
+      insightText1: "A mix of physical, psychological, and lifestyle factors. The good news: you're already open to the approach that works best.",
+      icon2: '🧭', insightLabel2: "Your Lever",
+      insightText2: 'Clarifying your values and using them as a compass — not "get rid of pain" but "get back to what matters most."',
+      cardBody3: 'The shift from <strong>"eliminate pain"</strong> as your goal to <strong>"live by your values"</strong> as your direction changes everything about motivation, resilience, and how you relate to setbacks.',
+      guideTitle: "The Rebuilder's Values-Based Recovery Guide",
+      guideSub: "Your personalized 30-day framework — the biopsychosocial model explained, all 6 ACT core processes, the 80th Birthday values exercise, and a foundation plan built for where you are right now.",
+      guideLink: "https://drive.google.com/file/d/1ZicFZL558N28gxwmxni0Zs8rAq3uXIln/view?usp=drive_link",
+      nextTitle: "Build on This With Real Support.",
+      nextBody: "What you've started here is the foundation of a genuinely different approach to pain — one that has your values at the center. If you want to go deeper with personalized guidance — pain science education, ACT-based tools, and a clear path back to what matters most — I'd love to connect."
+    }
+  };
+
+  // ── DETECT PROFILE FROM URL ───────────────────────────────────────────────
+  function getProfile() {
+    const params = new URLSearchParams(window.location.search);
+    const p = (params.get('profile') || '').toLowerCase();
+    if (p === 'fighter') return 'fighter';
+    if (p === 'avoider') return 'avoider';
+    if (p === 'rebuilder') return 'rebuilder';
+    return 'rebuilder'; // default fallback
+  }
+
+  // ── POPULATE PAGE ─────────────────────────────────────────────────────────
+  function populatePage(key) {
+    const d = profiles[key];
+    document.body.className = d.theme;
+
+    document.getElementById('profileName').textContent = d.name;
+    document.getElementById('heroSub').textContent = d.heroSub;
+    document.getElementById('cardTitle').textContent = d.cardTitle;
+    document.getElementById('cardBody1').innerHTML = d.cardBody1;
+    document.getElementById('cardBody2').innerHTML = d.cardBody2;
+    document.getElementById('quoteText').textContent = d.quote;
+    document.getElementById('icon1').textContent = d.icon1;
+    document.getElementById('insightLabel1').textContent = d.insightLabel1;
+    document.getElementById('insightText1').textContent = d.insightText1;
+    document.getElementById('icon2').textContent = d.icon2;
+    document.getElementById('insightLabel2').textContent = d.insightLabel2;
+    document.getElementById('insightText2').textContent = d.insightText2;
+    document.getElementById('cardBody3').innerHTML = d.cardBody3;
+    document.getElementById('guideTitle').textContent = d.guideTitle;
+    document.getElementById('guideSub').textContent = d.guideSub;
+    document.getElementById('downloadBtn').href = d.guideLink;
+    document.getElementById('nextTitle').textContent = d.nextTitle;
+    document.getElementById('nextBody').textContent = d.nextBody;
+    document.title = d.name.replace('.','') + ' Result | Derrick Hutchinson';
+  }
+
+  // ── INIT ──────────────────────────────────────────────────────────────────
+  window.addEventListener('DOMContentLoaded', () => {
+    const profile = getProfile();
+    populatePage(profile);
+
+    // Hide loading screen and reveal page
+    setTimeout(() => {
+      document.getElementById('loadingScreen').classList.add('hidden');
+      document.getElementById('mainPage').classList.add('visible');
+    }, 600);
+  });
+</script>
+</body>
+</html>
