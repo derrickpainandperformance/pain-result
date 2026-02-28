@@ -1129,7 +1129,7 @@ function submitForm() {
 
   var res = score();
 
-  fetch("https://formspree.io/f/YOUR_FORMSPREE_ID", {
+  fetch("https://formspree.io/f/mbdawnzn", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ firstName: fn, email: em, profile: res.key, score: res.total, answers: ans.join(",") })
