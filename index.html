@@ -943,8 +943,8 @@
       <p class="card-body" id="r-next-body"></p>
       <br>
       <div class="btn-row">
-        <a href="https://calendly.com/derrick-painandperformance" class="call-btn" target="_blank">Book a Free 20-Min Call →</a>
-        <p class="meta-text">Free &nbsp;·&nbsp; No pitch &nbsp;·&nbsp; Just a real conversation</p>
+        <a href="https://calendly.com/derrick-painandperformance" class="call-btn" target="_blank">Book a Free Pain Strategy Session →</a>
+        <p class="meta-text">Free &nbsp;·&nbsp; No sales pitch &nbsp;·&nbsp; Leave with a clear plan</p>
       </div>
     </div>
 
@@ -952,14 +952,14 @@
     <div class="footer-result">
       <div class="footer-name">Derrick Hutchinson</div>
       <div class="footer-creds">SPT &nbsp;·&nbsp; CSCS &nbsp;·&nbsp; Pain &amp; Performance</div>
-      <div class="footer-email">derrick.painandperformance@gmail.com</div>
+      <div class="footer-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="06626374746f656d2876676f686768627663746069746b6768656346616b676f6a2865696b">[email&#160;protected]</a></div>
       <div class="footer-disclaimer">This assessment is for educational purposes only and does not constitute medical advice.<br>Please consult a licensed healthcare provider for individualized treatment.</div>
     </div>
 
   </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ══ QUESTION DATA ════════════════════════════════════════════════════════════
 const questions = [
   {
@@ -1046,15 +1046,15 @@ const profiles = {
     cardTitle: "You've been fighting your pain. It's time to work with it.",
     body1: "You're driven, disciplined, and you refuse to let pain slow you down. The problem? Your body is sending you signals you've learned to override — and the gap between what you're pushing through and what your body actually needs is quietly making things worse.",
     body2: "High performers like you often treat pain as weakness rather than information. But here's what the research tells us: <strong>pain is not a sign of damage.</strong> It's a signal from your nervous system — and when you consistently override that signal, your nervous system learns to turn the volume up.",
-    quote: '"Your values guide your business. Why aren\'t they guiding your health?"',
+    quote: '"Your values guide your life. Why aren't they guiding your health?"',
     icon1: '⚡', label1: "What's Driving It", text1: "Low pain acceptance + high drive = nervous system overload. Your biggest obstacle is the belief that rest equals failure.",
     icon2: '🎯', label2: "Your Lever", text2: "Learning to separate clean pain (the sensation) from dirty pain (the story) will change everything for you.",
-    body3: "You don't need to stop being a high performer. You need to redirect that drive toward <strong>understanding your pain</strong> rather than fighting it.",
+    body3: "You don't need to stop being driven and ambitious. You need to redirect that drive toward <strong>understanding your pain</strong> rather than fighting it.",
     guideTitle: "The Fighter's Pain Reset Guide",
     guideSub: "Your personalized 30-day framework — pain science, ACT tools, and a values-based action plan built specifically for how you experience pain.",
     guideLink: "https://drive.google.com/file/d/1Z5ZUpzymfOJS9Y4J3PQvcM9ESd-QjGnw/view?usp=drive_link",
     nextTitle: "You Don't Have to Figure This Out Alone.",
-    nextBody: "If this resonated — if you're serious about getting back to what matters most with a framework that actually addresses what's driving your pain — I'd love to talk. I offer free 20-minute discovery calls for high performers who are ready to stop fighting their pain and start working with it.",
+    nextBody: "If this resonated — if you're serious about getting back to what matters most with a framework that actually addresses what's driving your pain — I'd love to talk. I offer free 20-minute Pain Strategy Sessions for driven people who are ready to stop fighting their pain and start working with it.",
     scoreBar: 28
   },
   rebuilder: {
@@ -1251,7 +1251,7 @@ async function submitForm() {
 
   // Send to Formspree (replace YOUR_FORMSPREE_ID with your actual ID)
   try {
-    await fetch('https://formspree.io/f/mbdawnzn', {
+    await fetch('https://formspree.io/f/YOUR_FORMSPREE_ID', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1308,13 +1308,4 @@ function showResult(profileKey, score, firstName) {
   }, 600);
 }
 
-// ══ INIT ══════════════════════════════════════════════════════════════════════
-window.addEventListener('DOMContentLoaded', () => {
-  buildQuestions();
-  setTimeout(() => {
-    document.getElementById('loadingScreen').classList.add('hidden');
-  }, 600);
-});
-</script>
-</body>
-</html>
+// ══ INIT ════════════════════════════════════════════════════════
