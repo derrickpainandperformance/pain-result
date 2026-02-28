@@ -697,6 +697,46 @@ body::before {
   .screen { padding: 16px; align-items: flex-start; }
   .inner { padding: 16px 0 50px; }
 }
+
+/* PROFILE THEMES */
+body.theme-fighter {
+  --accent: #e94560;
+  --accent2: #c73652;
+  --bg: #0a0a18;
+  --surface: #1a1a2e;
+  --surface2: #16213e;
+  --light: #f5f5f5;
+  --muted: #8888aa;
+  --body: #c8c8da;
+  --border: #2a2a42;
+  background-color: var(--bg);
+}
+
+body.theme-avoider {
+  --accent: #52B788;
+  --accent2: #3d9068;
+  --bg: #0a1410;
+  --surface: #1b2d2a;
+  --surface2: #132821;
+  --light: #f0f7f4;
+  --muted: #6a8f80;
+  --body: #b8d4c8;
+  --border: #2a3e38;
+  background-color: var(--bg);
+}
+
+body.theme-rebuilder {
+  --accent: #C77DFF;
+  --accent2: #a355e8;
+  --bg: #0e0b18;
+  --surface: #1e1b2e;
+  --surface2: #16132a;
+  --light: #f5f0ff;
+  --muted: #7a6a9a;
+  --body: #c4b8d8;
+  --border: #2e2a42;
+  background-color: var(--bg);
+}
 </style>
 </head>
 <body>
@@ -1133,6 +1173,10 @@ function submitForm() {
 // ── SHOW RESULT ───────────────────────────────────────────────────────────────
 function showResult(key, score) {
   var d = profiles[key];
+
+  // Apply profile theme
+  document.body.classList.remove('theme-fighter', 'theme-avoider', 'theme-rebuilder');
+  document.body.classList.add('theme-' + key);
 
   document.getElementById('r-name').textContent = d.name;
   document.getElementById('r-sub').textContent = d.sub;
