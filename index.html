@@ -1309,3 +1309,12 @@ function showResult(profileKey, score, firstName) {
 }
 
 // ══ INIT ════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  buildQuestions();
+  setTimeout(() => {
+    document.getElementById('loadingScreen').classList.add('hidden');
+  }, 600);
+});
+</script>
+</body>
+</html>
